@@ -6,6 +6,7 @@
       placeholder="Search Github username..."
       v-model="userName"
       id="user-input"
+      @focus="reset()"
     />
     <button @click="apiCall()">Search</button>
   </div>
@@ -27,14 +28,11 @@ export default {
         element.classList.add("no-input");
         element.placeholder = "Please fill in user name you want to search";
       } else {
-        element.classList.remove("no-input");
-        element.placeholder = "Search Github username...";
         axios
           .get("https://api.github.com/users/" + this.userName)
           .then((response) => {
-            element.classList.remove("no-input");
-            element.placeholder = "Search Github username...";
-            console.log(response);
+            this.user = response.data;
+            this.$emit("userDataLanded", this.user);
           })
           .catch(function (error) {
             if (error.response.status === 404) {
@@ -46,6 +44,15 @@ export default {
             // always excute
           });
       }
+    },
+    reset() {
+      const element = document.getElementById("user-input");
+      this.userName = "";
+      this.user = null;
+      element.value = "";
+      element.classList.remove("no-input");
+      element.placeholder = "Search Github username...";
+      this.$emit("userDataLanded", this.user);
     },
   },
 };
@@ -65,6 +72,7 @@ div {
   margin-left: 22px;
   width: 24px;
   height: 24px;
+  color: #0079ff;
 }
 div input {
   width: 500px;

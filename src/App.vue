@@ -8,7 +8,10 @@
       </div>
     </header>
     <main>
-      <search-bar class="search-bar"></search-bar>
+      <search-bar
+        class="search-bar"
+        @userDataLanded="processUserData"
+      ></search-bar>
       <search-result
         class="search-result"
         :userData="userData"
@@ -35,6 +38,9 @@ export default {
   methods: {
     toggleColorMode() {
       console.log("switch to mode");
+    },
+    processUserData(data) {
+      this.userData = data;
     },
   },
 };
