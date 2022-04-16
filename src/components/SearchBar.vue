@@ -1,15 +1,18 @@
 <template>
-  <div>
-    <font-awesome-icon class="icon" icon="fa-solid fa-magnifying-glass" />
-    <input
-      type="text"
-      placeholder="Search Github username..."
-      v-model="userName"
-      id="user-input"
-      @focus="reset()"
-    />
-    <button @click="apiCall()">Search</button>
-  </div>
+  <section>
+    <div>
+      <font-awesome-icon class="icon" icon="fa-solid fa-magnifying-glass" />
+      <input
+        type="text"
+        placeholder="Search Github username..."
+        v-model="userName"
+        @focus="resetInput()"
+        v-bind:class="{ 'no-input': isThereAValidationError }"
+      />
+      <p v-if="isThereAValidationError" style="color: red">Error Message</p>
+      <button @click="apiCall()">Search</button>
+    </div>
+  </section>
 </template>
 
 <script>
@@ -17,42 +20,28 @@ import axios from "axios";
 export default {
   data() {
     return {
+      isThereAValidationError: false,
       userName: "",
       user: {},
     };
   },
   methods: {
     apiCall() {
-      const element = document.getElementById("user-input");
-      if (this.userName === "") {
-        element.classList.add("no-input");
-        element.placeholder = "Please fill in user name you want to search";
-      } else {
-        axios
-          .get("https://api.github.com/users/" + this.userName)
-          .then((response) => {
-            this.user = response.data;
-            this.$emit("userDataLanded", this.user);
-          })
-          .catch(function (error) {
-            if (error.response.status === 404) {
-              element.classList.add("no-input");
-              element.value = "No results";
-            }
-          })
-          .then(function () {
-            // always excute
-          });
-      }
+      axios
+        .get("https://api.github.com/users/" + this.userName)
+        .then((response) => {
+          this.user = response.data;
+          this.isThereAValidationError = false;
+          this.$emit("userDataLanded", this.user);
+        })
+        .catch((error) => {
+          console.warn(error);
+          this.isThereAValidationError = true;
+        });
     },
-    reset() {
-      const element = document.getElementById("user-input");
+    resetInput() {
+      this.isThereAValidationError = false;
       this.userName = "";
-      this.user = null;
-      element.value = "";
-      element.classList.remove("no-input");
-      element.placeholder = "Search Github username...";
-      this.$emit("userDataLanded", this.user);
     },
   },
 };

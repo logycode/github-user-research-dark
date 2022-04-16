@@ -1,10 +1,15 @@
 <template>
-  <div id="app">
+  <div id="app" ref="body">
     <header>
       <h1>devfinder</h1>
-      <div>
+      <!-- <p v-if="lightMode == true">No light mode available</p> -->
+      <div v-if="lightMode == false">
         <button @click="toggleColorMode()">light</button>
         <font-awesome-icon icon="fa-solid fa-sun" />
+      </div>
+      <div v-if="lightMode == true">
+        <button @click="toggleColorMode()">dark</button>
+        <font-awesome-icon icon="fa-solid fa-moon" />
       </div>
     </header>
     <main>
@@ -29,6 +34,11 @@ export default {
   data() {
     return {
       userData: null,
+      lightMode: false,
+      lightStyle: {
+        "background-color": "white",
+        color: "black",
+      },
     };
   },
   components: {
@@ -37,7 +47,16 @@ export default {
   },
   methods: {
     toggleColorMode() {
-      console.log("switch to mode");
+      if (this.lightMode === false) {
+        this.lightMode = true;
+        // dark mode actived
+        this.$refs.body.setAttribute("dark-mode", "0");
+      } else {
+        this.lightMode = false;
+        // dark mode deactived
+        this.$refs.body.setAttribute("dark-mode", "1");
+      }
+      console.log(this.lightMode);
     },
     processUserData(data) {
       this.userData = data;
@@ -48,9 +67,13 @@ export default {
 
 <style lang="scss">
 body {
-  background-color: #141d2f;
+  margin: 0;
 }
 #app {
+  // I defined variables of default mode (light)
+  --header-color: red;
+
+  // other styles
   font-family: "Space Mono", monospace, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -58,8 +81,17 @@ body {
   color: #fff;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+  background-color: #141d2f;
+  min-height: 100vh;
 }
+
+// I defined variables of dark mode
+#app[dark-mode="0"] {
+  --header-color: #141d2f;
+  background-color: white;
+}
+
 header {
   display: flex;
   flex-direction: row;
@@ -67,6 +99,7 @@ header {
   align-items: center;
   margin: 144px auto 0;
   width: 730px;
+  color: var(--header-color);
 }
 button {
   background-color: #141d2f;
@@ -81,6 +114,6 @@ button {
 }
 .search-result {
   margin: 24px auto;
-  width: 730px;
+  width: 730px-96px;
 }
 </style>
